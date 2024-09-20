@@ -10,12 +10,8 @@ export default function Login() {
   const router = useRouter();
 
   const handleLogin = () => {
-    if (code === 'EERTF') {
-      localStorage.setItem('user', name); // Save the user's name to localStorage
-      router.push('/dashboard'); // Redirect to the dashboard
-    } else {
-      setError('Incorrect passcode!');
-    }
+    localStorage.setItem('user', name); // Save the user's name to localStorage
+    router.push('/dashboard'); // Redirect to the dashboard
   };
 
   return (
@@ -27,11 +23,6 @@ export default function Login() {
         <option value="Kishan">Kishan</option>
         <option value="Sandeep">Sandeep</option>
       </select>
-      <input
-        type="password"
-        placeholder="Enter Passcode"
-        onChange={(e) => setCode(e.target.value)}
-      />
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <button onClick={handleLogin}>Login</button>
     </div>
