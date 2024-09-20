@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 // Function to get the previous Saturday's date in DD/MM/YYYY format
 function getPreviousSaturday() {
@@ -18,6 +17,7 @@ function getPreviousSaturday() {
 
 export default function Dashboard() {
   const [chores, setChores] = useState([]);
+  const [completedChores, setCompletedChores] = useState([]); // Track completed chores
   const [currentWeek, setCurrentWeek] = useState('');  // Store the calculated current week
   const [user, setUser] = useState(null);  // State to hold the user's name
   const [error, setError] = useState(null);  // State to track any error
@@ -35,9 +35,6 @@ export default function Dashboard() {
         console.log('User:', storedUser);
         console.log('Current week:', currentWeekStart);
 
-        // debug static values
-        // const suser = 'Sandeep'; 
-        // const sweek = '21/09/2024';
         fetch(`/api/chores?user=${storedUser}&week=${currentWeekStart}`)
           .then(res => {
             if (!res.ok) {
@@ -57,6 +54,13 @@ export default function Dashboard() {
     }
   }, [router]);
 
+  // Toggle chore completion
+  const toggleChore = (index) => {
+    setCompletedChores((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
+  };
+
   if (!user || !currentWeek) {
     return <div>Loading...</div>;
   }
@@ -66,19 +70,109 @@ export default function Dashboard() {
   }
 
   return (
-    <div>
-      <h1>{user}&#39;s Chores for the Week of {currentWeek}</h1>
-      <ul>
+    <div style={styles.container}>
+      <h1 style={styles.title}>{user}&#39;s Chores for the Week of {currentWeek}</h1>
+      <ul style={styles.list}>
         {chores.length > 0 ? (
           chores.map((chore, index) => (
-            <li key={index}>
-              <input type="checkbox" /> {chore}
+            <li
+              key={index}
+              style={{
+                ...styles.listItem,
+                backgroundColor: completedChores.includes(index)
+                  ? styles.listItemHover.backgroundColor
+                  : styles.listItem.backgroundColor,
+                color: completedChores.includes(index)
+                  ? styles.listItemHover.color
+                  : styles.listItem.color,
+                textDecoration: completedChores.includes(index)
+                  ? 'line-through'
+                  : 'none',
+              }}
+              onClick={() => toggleChore(index)} // Mark chore as complete
+              onMouseEnter={(e) => {
+                if (!completedChores.includes(index)) {
+                  e.currentTarget.style.backgroundColor =
+                    styles.listItemHover.backgroundColor;
+                  e.currentTarget.style.color = styles.listItemHover.color;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!completedChores.includes(index)) {
+                  e.currentTarget.style.backgroundColor =
+                    styles.listItem.backgroundColor;
+                  e.currentTarget.style.color = styles.listItem.color;
+                }
+              }}
+            >
+              <span style={styles.chore}>{chore}</span>
             </li>
           ))
         ) : (
-          <li>No chores assigned for this week.</li>
+          <li style={styles.noChores}>No chores assigned for this week.</li>
         )}
       </ul>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+    backgroundColor: '#f7f7f7', // Light background for contrast
+    padding: '20px',
+  },
+  title: {
+    fontSize: '2rem',
+    marginBottom: '20px',
+    color: '#333', // Dark font color for visibility
+    fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: '1px',
+    borderBottom: '2px solid #333',
+    paddingBottom: '10px',
+  },
+  list: {
+    listStyle: 'none', // Remove bullets
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center', // Center the chores
+    gap: '20px', // Add spacing between the bubbles
+    width: '100%',
+  },
+  listItem: {
+    backgroundColor: '#e0e0e0', // Light grey for the bubble
+    padding: '15px 20px',
+    borderRadius: '50px', // Make it a bubble shape
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Soft shadow for the bubble
+    fontSize: '16px',
+    transition: 'background-color 0.3s, color 0.3s, text-decoration 0.3s',
+    cursor: 'pointer',
+    textAlign: 'center',
+    width: 'fit-content',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#333', // Default text color
+  },
+  chore: {
+    fontWeight: 'bold',
+    color: '#333', // Dark text color by default
+  },
+  noChores: {
+    padding: '10px',
+    fontSize: '18px',
+    color: '#999', // Lighter color for no chores message
+  },
+  listItemHover: {
+    backgroundColor: '#fff', // Dark background on hover
+    color: '#fff', // White text on hover
+  },
+};
