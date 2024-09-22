@@ -54,7 +54,7 @@ export default function Dashboard() {
           });
       }
     }
-  }, []);
+  }, [router]);
 
   if (!user || !currentWeek) {
     return <div>Loading...</div>;
