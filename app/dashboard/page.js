@@ -66,7 +66,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1>{user}'s Chores for the Week of {currentWeek}</h1> {/* Display the current week's date */}
+      <h1>{user}&#39;s Chores for the Week of {currentWeek}</h1>
       <ul>
         {chores.length > 0 ? (
           chores.map((chore, index) => (
