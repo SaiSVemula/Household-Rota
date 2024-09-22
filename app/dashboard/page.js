@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 // Function to get the previous Saturday's date in DD/MM/YYYY format
 function getPreviousSaturday() {

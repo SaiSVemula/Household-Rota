@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import { join } from 'path';
 import { promises as fs } from 'fs';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 // Function to convert a date (like "21/09/2024") to an Excel serial number
 function dateToExcelSerialNumber(dateString) {
